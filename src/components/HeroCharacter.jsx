@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { motion, useTransform } from "framer-motion";
 import { usePointerParallax, pointer, isTouch } from "../lib/motion";
 import personagem from "../assets/personagem.png";
-
+import { useEffect, useMemo, useRef, useState } from "react";
 /**
  * Personagem principal — GRADE DE OLHAR (3×3).
  *
@@ -88,10 +88,74 @@ export default function HeroCharacter() {
    ------------------------------------------------------------- */
 function GazeStack() {
   const refs = useRef([]);
+  const tilt = useRef({
+    x: 0,
+    y: 0,
+    baseBeta: null,
+    baseGamma: null,
+  });
+
+  const [motionEnabled, setMotionEnabled] = useState(false);
+  const [motionDenied, setMotionDenied] = useState(false);
+
+  const clamp = (v, min = -1, max = 1) => Math.max(min, Math.min(max, v));
+
+  async function requestMotionPermission() {
+    try {
+      if (
+        typeof DeviceOrientationEvent !== "undefined" &&
+        typeof DeviceOrientationEvent.requestPermission === "function"
+      ) {
+        const permission = await DeviceOrientationEvent.requestPermission();
+
+        if (permission !== "granted") {
+          setMotionDenied(true);
+          return;
+        }
+      }
+
+      setMotionEnabled(true);
+      setMotionDenied(false);
+    } catch (error) {
+      console.error("Erro ao pedir permissão de movimento:", error);
+      setMotionDenied(true);
+    }
+  }
 
   useEffect(() => {
-    if (isTouch) return;
+    if (!isTouch || !motionEnabled) return;
 
+    function handleOrientation(event) {
+      const beta = event.beta ?? 0;
+      const gamma = event.gamma ?? 0;
+
+      if (tilt.current.baseBeta === null) {
+        tilt.current.baseBeta = beta;
+        tilt.current.baseGamma = gamma;
+      }
+
+      const deltaGamma = gamma - tilt.current.baseGamma;
+      const deltaBeta = beta - tilt.current.baseBeta;
+
+      // Sensibilidade: quanto menor o número, mais sensível.
+      const sensitivityX = 24;
+      const sensitivityY = 24;
+
+      tilt.current.x = clamp(deltaGamma / sensitivityX);
+
+      // Se o cima/baixo ficar invertido, troque para:
+      // tilt.current.y = clamp(-deltaBeta / sensitivityY);
+      tilt.current.y = clamp(deltaBeta / sensitivityY);
+    }
+
+    window.addEventListener("deviceorientation", handleOrientation, true);
+
+    return () => {
+      window.removeEventListener("deviceorientation", handleOrientation, true);
+    };
+  }, [motionEnabled]);
+
+  useEffect(() => {
     let raf;
 
     const cur = {
@@ -99,23 +163,24 @@ function GazeStack() {
       y: 0,
     };
 
-    const clamp = (v, min = -1, max = 1) => Math.max(min, Math.min(max, v));
-
     const loop = () => {
-      // Mouse normalizado:
-      // x: -1 esquerda | 0 centro | 1 direita
-      // y: -1 cima     | 0 centro | 1 baixo
-      const tx = clamp(pointer.nx);
-      const ty = clamp(pointer.ny);
+      let tx = 0;
+      let ty = 0;
 
-      // Suavização do movimento do olhar
+      if (isTouch && motionEnabled) {
+        tx = tilt.current.x;
+        ty = tilt.current.y;
+      } else if (!isTouch) {
+        tx = clamp(pointer.nx);
+        ty = clamp(pointer.ny);
+      }
+
       cur.x += (tx - cur.x) * 0.12;
       cur.y += (ty - cur.y) * 0.12;
 
       const ax = Math.abs(cur.x);
       const ay = Math.abs(cur.y);
 
-      // Pesos de cada direção
       const weights = {
         center: Math.max(0, 1 - Math.max(ax, ay) * 1.45),
         left: Math.max(0, -cur.x),
@@ -124,13 +189,12 @@ function GazeStack() {
         down: Math.max(0, cur.y),
       };
 
-      // Normaliza para a soma das opacidades ficar natural
       const total =
         weights.center +
-        weights.left +
-        weights.right +
-        weights.up +
-        weights.down || 1;
+          weights.left +
+          weights.right +
+          weights.up +
+          weights.down || 1;
 
       for (let i = 0; i < CELLS.length; i++) {
         const cell = CELLS[i];
@@ -148,7 +212,7 @@ function GazeStack() {
     raf = requestAnimationFrame(loop);
 
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [motionEnabled]);
 
   const imgStyle = {
     filter:
@@ -178,6 +242,22 @@ function GazeStack() {
           }}
         />
       ))}
+
+      {isTouch && !motionEnabled && (
+        <button
+          type="button"
+          onClick={requestMotionPermission}
+          className="absolute bottom-4 left-1/2 z-30 -translate-x-1/2 rounded-full border border-neon-cyan/40 bg-black/50 px-4 py-2 font-display text-[10px] uppercase tracking-[0.25em] text-neon-cyan backdrop-blur-md shadow-[0_0_24px_rgba(34,211,238,0.25)]"
+        >
+          Ativar movimento
+        </button>
+      )}
+
+      {isTouch && motionDenied && (
+        <div className="absolute bottom-16 left-1/2 z-30 w-64 -translate-x-1/2 rounded-xl border border-red-400/30 bg-black/60 px-4 py-3 text-center text-xs text-red-200 backdrop-blur-md">
+          Permissão de movimento negada. Ative nas configurações do navegador.
+        </div>
+      )}
     </motion.div>
   );
 }
