@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useTransform } from "framer-motion";
 import { usePointerParallax, pointer, isTouch } from "../lib/motion";
 import personagem from "../assets/personagem.png";
-import { useEffect, useMemo, useRef, useState } from "react";
 /**
  * Personagem principal — GRADE DE OLHAR (3×3).
  *
