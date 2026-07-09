@@ -1,0 +1,272 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   BASE
+   ============================================================ */
+:root {
+  --neon-cyan: #22d3ee;
+  --neon-blue: #3b82f6;
+  --neon-purple: #a855f7;
+  --neon-pink: #ec4899;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #03040a;
+  color: #e2f3ff;
+  font-family: "Rajdhani", "Inter", sans-serif;
+  overflow-x: hidden;
+}
+
+body {
+  /* Cursor futurista custom no desktop; mantemos auto em touch */
+  cursor: auto;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body.has-custom-cursor,
+  body.has-custom-cursor * {
+    cursor: none;
+  }
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.3);
+  color: #ffffff;
+}
+
+/* Scrollbar futurista */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #03040a;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #22d3ee, #a855f7);
+  border-radius: 10px;
+}
+
+/* ============================================================
+   UTILIDADES CUSTOM
+   ============================================================ */
+@layer components {
+  .font-display {
+    font-family: "Orbitron", sans-serif;
+  }
+
+  .text-glow-cyan {
+    text-shadow: 0 0 8px rgba(34, 211, 238, 0.8), 0 0 22px rgba(34, 211, 238, 0.5);
+  }
+  .text-glow-purple {
+    text-shadow: 0 0 8px rgba(168, 85, 247, 0.8), 0 0 22px rgba(168, 85, 247, 0.5);
+  }
+
+  /* Cartão de vidro holográfico */
+  .glass {
+    background: linear-gradient(
+      135deg,
+      rgba(15, 23, 51, 0.55),
+      rgba(6, 8, 20, 0.35)
+    );
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(34, 211, 238, 0.25);
+  }
+
+  .glass-strong {
+    background: linear-gradient(
+      135deg,
+      rgba(15, 23, 51, 0.8),
+      rgba(6, 8, 20, 0.6)
+    );
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(34, 211, 238, 0.3);
+  }
+
+  /* Borda holográfica animada */
+  .holo-border {
+    position: relative;
+  }
+  .holo-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      rgba(34, 211, 238, 0.8),
+      rgba(168, 85, 247, 0.2),
+      rgba(236, 72, 153, 0.6)
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Botão estilo HUD videogame */
+  .btn-hud {
+    position: relative;
+    overflow: hidden;
+    font-family: "Orbitron", sans-serif;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border: 1px solid rgba(34, 211, 238, 0.5);
+    background: rgba(10, 14, 34, 0.6);
+    color: #c9f3ff;
+    transition: all 0.25s ease;
+  }
+  .btn-hud::after {
+    /* efeito scanner que cruza o botão */
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(34, 211, 238, 0.35),
+      transparent
+    );
+    transform: skewX(-20deg);
+    transition: left 0.6s ease;
+  }
+  .btn-hud:hover {
+    border-color: rgba(34, 211, 238, 1);
+    box-shadow: 0 0 16px rgba(34, 211, 238, 0.55),
+      inset 0 0 14px rgba(34, 211, 238, 0.15);
+    transform: translateY(-2px) scale(1.03);
+    color: #ffffff;
+  }
+  .btn-hud:hover::after {
+    left: 120%;
+  }
+
+  /* Grade de fundo tipo HUD */
+  .hud-grid {
+    background-image: linear-gradient(
+        rgba(34, 211, 238, 0.06) 1px,
+        transparent 1px
+      ),
+      linear-gradient(90deg, rgba(34, 211, 238, 0.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  /* Cantos de mira tipo HUD */
+  .hud-corners::before,
+  .hud-corners::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-color: rgba(34, 211, 238, 0.7);
+  }
+  .hud-corners::before {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid;
+    border-left: 2px solid;
+  }
+  .hud-corners::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid;
+    border-right: 2px solid;
+  }
+}
+
+/* Linha de scan global sutil sobre toda a tela */
+.global-scanlines {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.18) 3px,
+    rgba(0, 0, 0, 0) 4px
+  );
+  opacity: 0.35;
+}
+
+/* Vinheta cinematográfica para profundidade */
+.vignette {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 48%,
+    rgba(3, 4, 10, 0.55) 78%,
+    rgba(2, 2, 6, 0.92) 100%
+  );
+}
+
+/* Letterbox cinematográfico suave (escurece topo/base como filme) */
+.cine-bars {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 56;
+  background: linear-gradient(
+      to bottom,
+      rgba(2, 2, 6, 0.85),
+      transparent 12%
+    ),
+    linear-gradient(to top, rgba(2, 2, 6, 0.85), transparent 12%);
+}
+
+/* Color grade cinematográfico (teal nas sombras, magenta nos realces) */
+.cine-grade {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 57;
+  background: radial-gradient(
+      120% 80% at 50% 0%,
+      rgba(34, 211, 238, 0.1),
+      transparent 60%
+    ),
+    radial-gradient(
+      120% 80% at 50% 100%,
+      rgba(168, 85, 247, 0.1),
+      transparent 60%
+    );
+}
+
+/* Grão de filme estático (sem animação = barato p/ GPU) */
+.film-grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 58;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 150px 150px;
+}
+
+/* Reduz movimento para quem pede acessibilidade */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
