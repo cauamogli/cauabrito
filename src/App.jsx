@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import HackerMode from "./components/HackerMode";
 import { AnimatePresence, motion } from "framer-motion";
 import { GraduationCap, User2, Rocket } from "lucide-react";
 
@@ -119,19 +120,7 @@ export default function App() {
               </div>
 
               {/* Indicador de scroll */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1, y: [0, 8, 0] }}
-                transition={{ delay: 1.5, duration: 2, repeat: Infinity }}
-                className="absolute bottom-6 left-1/2 -translate-x-1/2 text-center"
-              >
-                <div className="font-display text-[9px] tracking-[0.3em] text-neon-cyan/60">
-                  SCROLL // ACCELERATE FALL
-                </div>
-                <div className="mx-auto mt-2 h-8 w-5 rounded-full border border-neon-cyan/40">
-                  <div className="mx-auto mt-1.5 h-1.5 w-1 rounded-full bg-neon-cyan" />
-                </div>
-              </motion.div>
+              
             </section>
 
             {/* ===================== SOBRE MIM ===================== */}
@@ -193,9 +182,13 @@ export default function App() {
           </motion.main>
         )}
       </AnimatePresence>
+
+      {/* Botão Modo Hacker + som discreto */}
+      {started && <HackerMode />}
     </>
   );
 }
+
 
 /* Barra HUD fixa no topo do Hero */
 function TopHud() {
@@ -203,7 +196,7 @@ function TopHud() {
     <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-between px-6 py-4 font-display text-[10px] tracking-[0.25em] text-neon-cyan/60">
       <span className="flex items-center gap-2">
         <span className="h-2 w-2 animate-pulse rounded-full bg-neon-green shadow-[0_0_8px_#22ff99]" />
-        DEVELOPER ORBIT
+        DEVELOPER 
       </span>
       <span className="hidden items-center gap-2 sm:flex">
         ORBIT STABILIZED
@@ -246,7 +239,10 @@ function SideRail({ side = "left", items = [] }) {
         className={`mt-3 h-16 w-[1px] bg-gradient-to-b from-neon-cyan/50 to-transparent ${
           isLeft ? "" : ""
         }`}
+        
+
       />
     </div>
+    
   );
 }

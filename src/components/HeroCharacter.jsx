@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useTransform } from "framer-motion";
 import { usePointerParallax, pointer, isTouch } from "../lib/motion";
 import personagem from "../assets/personagem.png";
+import CharacterScanner from "./CharacterScanner";
 /**
  * Personagem principal — GRADE DE OLHAR (3×3).
  *
@@ -72,7 +73,10 @@ export default function HeroCharacter() {
           }}
           transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
         >
-          <GazeStack />
+          <div className="relative">
+  <GazeStack />
+  <CharacterScanner />
+</div>
         </motion.div>
       </motion.div>
 
@@ -332,10 +336,10 @@ function LockOnFrame() {
       <span className={`${corner} bottom-0 right-0 border-b border-r`} />
 
       <Readout className="left-0 -top-5" tick="left">
-        TARGET LOCK
+        
       </Readout>
       <Readout className="right-0 -top-5" tick="right">
-        ID: CAUÃ
+      
       </Readout>
       <Readout className="left-0 -bottom-5" tick="left">
         SCAN&nbsp;98%
