@@ -140,15 +140,13 @@ function GazeStack() {
       const deltaGamma = gamma - tilt.current.baseGamma;
       const deltaBeta = beta - tilt.current.baseBeta;
 
-      // Sensibilidade: quanto menor o número, mais sensível.
-      const sensitivityX = 24;
-      const sensitivityY = 24;
+// Sensibilidade do celular:
+// quanto menor o número, menos precisa virar o celular.
+const sensitivityX = 10;
+const sensitivityY = 10;
 
-      tilt.current.x = clamp(deltaGamma / sensitivityX);
-
-      // Se o cima/baixo ficar invertido, troque para:
-      // tilt.current.y = clamp(-deltaBeta / sensitivityY);
-      tilt.current.y = clamp(deltaBeta / sensitivityY);
+tilt.current.x = clamp(deltaGamma / sensitivityX);
+tilt.current.y = clamp(deltaBeta / sensitivityY);
     }
 
     window.addEventListener("deviceorientation", handleOrientation, true);
@@ -173,10 +171,15 @@ function GazeStack() {
       if (isTouch && motionEnabled) {
         tx = tilt.current.x;
         ty = tilt.current.y;
-      } else if (!isTouch) {
-        tx = clamp(pointer.nx);
-        ty = clamp(pointer.ny);
-      }
+} else if (!isTouch) {
+  // Sensibilidade do mouse:
+  // quanto maior o número, menos precisa mover o mouse.
+  const mouseSensitivityX = 2.4;
+  const mouseSensitivityY = 2.0;
+
+  tx = clamp(pointer.nx * mouseSensitivityX);
+  ty = clamp(pointer.ny * mouseSensitivityY);
+}
 
       cur.x += (tx - cur.x) * 0.12;
       cur.y += (ty - cur.y) * 0.12;
